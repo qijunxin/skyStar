@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>星空</title>
+	<script type="x-shader/x-vertex" id="vertex-shader">
+	    attribute float size;
+	    attribute float idx;
+	    attribute float matid;
+
+	    uniform float timeline;
+
+	    varying vec4 vColor;
+	    varying float vMatid;
+
+	    void main() {
+	        vec3 color = vec3(1.0,1.0,1.0);
+	        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+
+	        float alpha = 1.0;
+	        float enlarge = .0;
+
+	        if(length(mvPosition.xyz) < 400.0) {
+	            enlarge = (sin(timeline - idx) * 40.0);
+	        } else {
+	            enlarge = (sin(timeline - idx) * 10.0);
+	        }
+	        
+
+	        if(enlarge < 0.1) {
+	            enlarge = .0 - enlarge + 1.0;
+	        }
+
+	        vColor = vec4(color, alpha);
+	        vMatid = matid;
+
+	        gl_Position = projectionMatrix * mvPosition;
+	        gl_PointSize = 1500.0 / length(mvPosition.xyz) * size + enlarge;
+
+	    }
+	</script>
+	<script type="x-shader/x-fragment" id="fragment-shader">
+	    uniform sampler2D texture1;
+	    uniform sampler2D texture2;
+	    uniform sampler2D texture3;
+	    uniform sampler2D texture4;
+	    varying vec4 vColor;
+	    varying float vMatid;
+
+	    void main() {
+	        if(vMatid > 3.5) {
+	            gl_FragColor = vColor * texture2D(texture4, gl_PointCoord) ;
+	        } else if(vMatid > 2.5) {
+	            gl_FragColor = vColor * texture2D(texture3, gl_PointCoord) ;
+	        } else if(vMatid > 1.5) {
+	            gl_FragColor = vColor * texture2D(texture2, gl_PointCoord) ;
+	        } else {
+	            gl_FragColor = vColor * texture2D(texture1, gl_PointCoord) ;
+	        }
+	    }
+	</script>
+	<script src="js/three.js"></script>
+	<script src="js/tween.min.js"></script>
+	<script src="js/TrackballControls.js"></script>
+	<script src="js/Projector.js"></script>
+	<script src="js/Cotem.js"></script>
+	<script src="js/createCotem.js"></script>
+</head>
+<body>
+<div id="sky-canvas"></div>		
+<script src="js/index.js"></script>
+</body>
+</html>
